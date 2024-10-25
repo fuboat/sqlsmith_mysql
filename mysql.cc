@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <stdexcept>
+#include <cstdlib>
 #include <regex>
 
 #include "mysql.hh"
@@ -9,14 +10,30 @@ using namespace std;
 
 static regex e_syntax("You have an error in your SQL syntax.*");
 
+#define MYSQL_HOST getenv("SQLSMITH_MYSQL_HOST")
+#define MYSQL_PORT getenv("SQLSMITH_MYSQL_PORT")
+#define MYSQL_USERNAME getenv("SQLSMITH_MYSQL_USERNAME")
+#define MYSQL_PASSWORD getenv("SQLSMITH_MYSQL_PASSWORD")
+#define MYSQL_DBNAME getenv("MYSQL_DBNAME")
+
 mysql_connection::mysql_connection(const std::string &conninfo)
 {
   (void) conninfo;
   con = mysql_init(NULL);
-  if (!mysql_real_connect(con, "localhost", "smith", "smith", 
-			  "smith" /*dbname*/, 0, NULL, 0)) {
+
+  const char * mysql_host = MYSQL_HOST ? MYSQL_HOST : "127.0.0.1";
+  const char * mysql_port = MYSQL_PORT ? MYSQL_PORT : "3306";
+  const char * mysql_username = MYSQL_USERNAME ? MYSQL_USERNAME : "root";
+  const char * mysql_password = MYSQL_PASSWORD ? MYSQL_PASSWORD : "root";
+  const char * mysql_database = MYSQL_DBNAME ? MYSQL_DBNAME : "sys";
+
+  printf("I will connect!");
+
+  if (!mysql_real_connect(con, mysql_host, mysql_username, mysql_password, mysql_database, atoi(mysql_port), NULL, 0)) {
     throw runtime_error(mysql_error(con));
   }
+
+  printf("connection down!");
 }
 
 void mysql_connection::q(std::string s)
