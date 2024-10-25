@@ -8,22 +8,39 @@
 这是一个 fork 版本的 SQLsmith，用于测试 mysql。
 
 安装sqlsmith：
-```bash
+
+#+BEGIN_SRC shell
 apt-get install build-essential autoconf autoconf-archive libpqxx-dev libboost-regex-dev libsqlite3-dev libmysqlclient-dev
 cd sqlsmith
 autoreconf -i
 ./configure
 make
-```
+#+END_SRC
+
+make 执行完毕后会在当前目录生成一个 ./sqlsmith 的可执行文件。
 
 运行方式：目前mysql的连接参数通过环境变量来指定。例如：
-```
+
+#+BEGIN_SRC shell
 SQLSMITH_MYSQL_HOST="192.8.0.10" \
 SQLSMITH_MYSQL_PORT="3306" \
 SQLSMITH_MYSQL_USERNAME='root' \
 SQLSMITH_MYSQL_PASSWORD='root' \
-SQLSMITH_MYSQL_DBNAME='mysql' /root/jingzhou_workspace/DepState/sqlsmith/build/sqlsmith --mysql=''
-```
+SQLSMITH_MYSQL_DBNAME='mysql' ./sqlsmith --mysql=''  # 环境变量的值修改成你自己的 mysql 连接参数
+#+END_SRC
+
+需要注意的是，sqlsmith 在 mysql 上会生成速度很慢的查询，因此建议通过 max_execution_time 限制 mysql 单条语句的执行时间。例如：
+
+#+BEGIN_SRC shell
+mysql --host='192.8.0.10' --port=3306 --user=root --password=root mysql  # 修改成你自己的 mysql 连接参数
+mysql> SET GLOBAL max_execution_time = 5000;
+#+END_SRC
+
+对于 MariaDB，则需要使用：
+
+#+BEGIN_SRC sql
+SET GLOBAL max_statement_time = 5;
+#+END_SRC
 
 ** Description
 SQLsmith is a random SQL query generator.  Its paragon is [[https://embed.cs.utah.edu/csmith/][Csmith]],
